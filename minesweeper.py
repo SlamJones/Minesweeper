@@ -9,8 +9,8 @@ from graphics import *
 
 settings = {
     "debug_mode": False,
-    "window_x": 850,
-    "window_y": 900,
+    "window_x": 1000,
+    "window_y": 850,
     "bg_color": "black",
     "fg_color": "white",
     "square_size": 50,
@@ -175,6 +175,7 @@ def choice_buttons(win,choices,header):
         else:
             button["rect"].setFill(settings["bg_color"])
             button["text"].setTextColor(settings["fg_color"])
+            choice = "Easy"
     ####################
     for item in to_draw:
         item.undraw()
@@ -417,19 +418,45 @@ def draw_grid(win,grid,rows,difficulty):
                     button["text"].setText(":(")
                     win.update()
                     key = "Escape"
-                    time.sleep(1)
+                    time.sleep(0.2)
+                    for button in buttons:
+                        if button["mined"]:
+                            button["text"].setText("X")
+                    win.update()
+                    show_info_box(win,"KaBoom!  You lose!",1.5)
                 elif button["adjacent"] == 0:
                     check_adjacent(win,buttons,button)
                 else:
                     button["text"].setText(str(button["adjacent"]))
                 button["clicked"] = True
         win.update()
+        victory = check_victory(win,buttons)
+        if victory:
+            key = "Escape"
     ##### END PLAYER INPUT STACK #####
     #####
     
     for item in to_draw:
         item.undraw()
     win.update()
+    
+    
+def check_victory(win,buttons):
+    count = 0
+    mines = 0
+    for button in buttons:
+        if button["mined"]:
+            mines += 1
+        if not button["clicked"]:
+            count += 1
+    if mines == count:
+        for button in buttons:
+            if not button["clicked"]:
+                button["text"].setText("X")
+        win.update()
+        show_info_box(win,"You win!  Well played!",0)
+        return(True)
+    return(False)
     
     
 def check_adjacent(win,buttons,button):
@@ -491,10 +518,42 @@ def check_adjacent(win,buttons,button):
         item["clicked"] = True
         check_adjacent(win,buttons,item)
     win.update()
-        
-                
+
     
+def show_info_box(win,text,timer):
+    to_draw = []
+    centerX = settings["window_x"]/2
+    centerY = settings["window_y"]/2
     
+    P1X = centerX - settings["button_width"]
+    P2X = centerX + settings["button_width"]
+    P1Y = centerY - settings["button_height"]
+    P2Y = centerY + settings["button_height"]
+    
+    box = Rectangle(Point(P1X,P1Y),Point(P2X,P2Y))
+    box.setFill(settings["bg_color"])
+    box.setOutline(settings["fg_color"])
+    box.setWidth(3)
+    
+    text = Text(Point(centerX,centerY),text)
+    text.setTextColor(settings["fg_color"])
+    text.setStyle("bold")
+    
+    to_draw.append(box)
+    to_draw.append(text)
+    
+    for item in to_draw:
+        item.draw(win)
+    win.update()
+    
+    if timer == 0:
+        win.getMouse()
+    else:
+        time.sleep(timer)
+
+    for item in to_draw:
+        item.undraw()
+    win.update()
     
     
 def flash_button(win,button,flash_time):
