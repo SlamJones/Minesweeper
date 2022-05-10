@@ -413,7 +413,9 @@ def draw_grid(win,grid,rows,difficulty):
             if clickX >= button["x1"] and clickX <= button["x2"] and clickY >= button["y1"] and clickY <= button["y2"] and not button["clicked"]:
                 if settings["debug_mode"]:
                     print("Clicked on {}".format(str(button)))
-                flash_button(win,button,0.001)
+                #flash_button(win,button,0.0001)
+                button["rect"].setFill(settings["bg_color"])
+                button["text"].setTextColor(settings["fg_color"])
                 if button["mined"]:
                     button["text"].setText(":(")
                     win.update()
@@ -512,7 +514,9 @@ def check_adjacent(win,buttons,button):
                 to_reveal.append(check_button)
                 
     for item in to_reveal:
-        flash_button(win,item,0.01)
+        flash_button(win,item,0)
+        #button["rect"].setFill(settings["bg_color"])
+        #button["text"].setTextColor(settings["fg_color"])
         #item["text"].setText(str(item["adjacent"]))
         #item["text"].setTextColor(settings["fg_color"])
         item["clicked"] = True
@@ -559,11 +563,13 @@ def show_info_box(win,text,timer):
 def flash_button(win,button,flash_time):
     button["rect"].setFill(settings["fg_color"])
     button["text"].setTextColor(settings["bg_color"])
-    win.update()
-    time.sleep(flash_time)
+    if flash_time > 0:
+        win.update()
+        time.sleep(flash_time)
     button["rect"].setFill(settings["bg_color"])
     button["text"].setTextColor(settings["fg_color"])
-    win.update()
+    if flash_time > 0:
+        win.update()
         
         
 def farewell():
