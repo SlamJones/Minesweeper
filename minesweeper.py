@@ -10,7 +10,7 @@ from graphics import *
 settings = {
     "debug_mode": False,
     "window_x": 850,
-    "window_y": 850,
+    "window_y": 900,
     "bg_color": "black",
     "fg_color": "white",
     "square_size": 50,
