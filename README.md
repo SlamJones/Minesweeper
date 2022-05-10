@@ -24,6 +24,7 @@ informing the user of the achieved condition.  The
 user is then returned to the main menu.
 
 There are three difficulty settings: Easy, Medium, Hard
+
 Easy: 8 x 8 grid (64 buttons) with 8 mines
 Medium: 12 x 12 grid (144 buttons) with 12 mines
 Hard: 16 x 16 grid (256 buttons) with 16 mines
