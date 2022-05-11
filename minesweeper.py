@@ -428,6 +428,7 @@ def draw_grid(win,grid,rows,difficulty):
                     show_info_box(win,"KaBoom!  You lose!",1.5)
                 elif button["adjacent"] == 0:
                     check_adjacent(win,buttons,button)
+                    reveal_borders(win,buttons)
                 else:
                     button["text"].setText(str(button["adjacent"]))
                 button["clicked"] = True
@@ -467,62 +468,124 @@ def check_adjacent(win,buttons,button):
     centerY = (button["y1"] + button["y2"]) / 2
         
     for check_button in buttons:
-        if not check_button["clicked"]:
+        if not check_button["clicked"] and check_button["adjacent"] == 0:
             #if check_button is not button:
             ##### Test LEFT #####
             testX = centerX - settings["square_size"]
-            if (testX >= check_button["x1"] and testX <= check_button["x2"] and centerY >= check_button["y1"] and centerY <= check_button["y2"]) and check_button["adjacent"] == 0:
+            if (testX >= check_button["x1"] and testX <= check_button["x2"] and centerY >= check_button["y1"] and centerY <= check_button["y2"]):
                 to_reveal.append(check_button)
 
             ##### Test RIGHT #####
             testX = centerX + settings["square_size"]
-            if (testX >= check_button["x1"] and testX <= check_button["x2"] and centerY >= check_button["y1"] and centerY <= check_button["y2"]) and check_button["adjacent"] == 0:
+            if (testX >= check_button["x1"] and testX <= check_button["x2"] and centerY >= check_button["y1"] and centerY <= check_button["y2"]):
                 to_reveal.append(check_button)
 
             ##### Test ABOVE #####
             testY = centerY - settings["square_size"]
-            if (centerX >= check_button["x1"] and centerX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]) and check_button["adjacent"] == 0:
+            if (centerX >= check_button["x1"] and centerX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
                 to_reveal.append(check_button)
 
             ##### Test BELOW #####
             testY = centerY + settings["square_size"]
-            if (centerX >= check_button["x1"] and centerX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]) and check_button["adjacent"] == 0:
+            if (centerX >= check_button["x1"] and centerX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
                 to_reveal.append(check_button)
                         
             ##### Test UPPER-LEFT #####
             testX = centerX - settings["square_size"]
             testY = centerY - settings["square_size"]
-            if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]) and check_button["adjacent"] == 0:
+            if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
                 to_reveal.append(check_button)
 
             ##### Test UPPER-RIGHT #####
             testX = centerX + settings["square_size"]
             testY = centerY - settings["square_size"]
-            if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]) and check_button["adjacent"] == 0:
+            if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
                 to_reveal.append(check_button)
                         
             ##### Test LOWER-LEFT #####
             testX = centerX - settings["square_size"]
             testY = centerY + settings["square_size"]
-            if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]) and check_button["adjacent"] == 0:
+            if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
                 to_reveal.append(check_button)
 
             ##### Test LOWER-RIGHT #####
             testX = centerX + settings["square_size"]
             testY = centerY + settings["square_size"]
-            if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]) and check_button["adjacent"] == 0:
+            if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
                 to_reveal.append(check_button)
                 
     for item in to_reveal:
         flash_button(win,item,0)
-        #button["rect"].setFill(settings["bg_color"])
-        #button["text"].setTextColor(settings["fg_color"])
-        #item["text"].setText(str(item["adjacent"]))
-        #item["text"].setTextColor(settings["fg_color"])
         item["clicked"] = True
         check_adjacent(win,buttons,item)
     win.update()
+    
+    
+    ###### Recieves a list of all buttons
+    ###### Determine which buttons have been clicked and have 0 adjacent mined buttons
+    ###### Gather a list of all buttons adjacent to determined buttons
+    ###### Reveal list
+    
+def reveal_borders(win,buttons):
+    to_reveal = []
+    for button in buttons:
+        if button["clicked"] and button["adjacent"] == 0:
+            for check_button in buttons:
+                centerX = (button["x1"] + button["x2"]) / 2
+                centerY = (button["y1"] + button["y2"]) / 2
+                #if check_button is not button:
+                ##### Test LEFT #####
+                testX = centerX - settings["square_size"]
+                if (testX >= check_button["x1"] and testX <= check_button["x2"] and centerY >= check_button["y1"] and centerY <= check_button["y2"]):
+                    to_reveal.append(check_button)
 
+                ##### Test RIGHT #####
+                testX = centerX + settings["square_size"]
+                if (testX >= check_button["x1"] and testX <= check_button["x2"] and centerY >= check_button["y1"] and centerY <= check_button["y2"]):
+                    to_reveal.append(check_button)
+
+                ##### Test ABOVE #####
+                testY = centerY - settings["square_size"]
+                if (centerX >= check_button["x1"] and centerX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
+                    to_reveal.append(check_button)
+
+                ##### Test BELOW #####
+                testY = centerY + settings["square_size"]
+                if (centerX >= check_button["x1"] and centerX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
+                    to_reveal.append(check_button)
+
+                ##### Test UPPER-LEFT #####
+                testX = centerX - settings["square_size"]
+                testY = centerY - settings["square_size"]
+                if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
+                    to_reveal.append(check_button)
+
+                ##### Test UPPER-RIGHT #####
+                testX = centerX + settings["square_size"]
+                testY = centerY - settings["square_size"]
+                if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
+                    to_reveal.append(check_button)
+
+                ##### Test LOWER-LEFT #####
+                testX = centerX - settings["square_size"]
+                testY = centerY + settings["square_size"]
+                if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
+                    to_reveal.append(check_button)
+
+                ##### Test LOWER-RIGHT #####
+                testX = centerX + settings["square_size"]
+                testY = centerY + settings["square_size"]
+                if (testX >= check_button["x1"] and testX <= check_button["x2"] and testY >= check_button["y1"] and testY <= check_button["y2"]):
+                    to_reveal.append(check_button)
+            
+    for item in to_reveal:
+        flash_button(win,item,0)
+        item["text"].setTextColor("white")
+        if item["adjacent"] > 0:
+            item["text"].setText(str(item["adjacent"]))
+        item["clicked"] = True
+    win.update()
+    
     
 def show_info_box(win,text,timer):
     to_draw = []
