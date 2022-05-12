@@ -10,7 +10,7 @@ from graphics import *
 settings = {
     "debug_mode": False,
     "window_x": 1000,
-    "window_y": 850,
+    "window_y": 980,
     "bg_color": "black",
     "fg_color": "white",
     "square_size": 50,
@@ -23,6 +23,7 @@ settings = {
     "button_width": 250,
     "button_height": 50,
     "button_spacing": 40,
+    "header_height": 50,
 }
 
 grid = []
@@ -224,7 +225,7 @@ def draw_grid(win,grid,rows,difficulty):
     container_width = settings["square_size"]*rows
     container_height = container_width
     centerX = settings["window_x"]/2
-    centerY = settings["window_y"]/2
+    centerY = settings["window_y"]/2 + settings["header_height"]
     
     P1X = centerX - container_width/2
     P2X = centerX + container_width/2
@@ -241,6 +242,26 @@ def draw_grid(win,grid,rows,difficulty):
     container.setOutline(settings["fg_color"])
     container.setWidth(4)
     to_draw.append(container)
+    
+    #### Draw top GUI ####
+    cP1X = centerX - settings["square_size"]*0.75
+    cP2X = centerX + settings["square_size"]*0.75
+    cP1Y = settings["button_spacing"]/2
+    cP2Y = cP1Y + settings["square_size"]*1.5
+    
+    center_button = Rectangle(Point(cP1X,cP1Y),Point(cP2X,cP2Y))
+    center_button.setFill(settings["bg_color"])
+    center_button.setOutline(settings["fg_color"])
+    center_button.setWidth(3)
+    to_draw.append(center_button)
+    
+    center_text = Text(Point(centerX,(cP1Y+cP2Y)/2),"X")
+    center_text.setTextColor(settings["fg_color"])
+    center_text.setStyle("bold")
+    center_text.setSize(16)
+    to_draw.append(center_text)
+    
+    menu_button = {"rect": center_button, "text": center_text, "x1": cP1X, "y1": cP1Y, "x2": cP2X, "y2": cP2Y, "flag": False,}
     
     for i in range(rows):
         P1X += settings["square_size"]
@@ -409,29 +430,48 @@ def draw_grid(win,grid,rows,difficulty):
             clickY = 0
         if click != None and settings["debug_mode"]:
             print(str(click))
+        ### CHECK IF PLAYER CLICKED FLAG BUTTON ###
+        if clickX >= menu_button["x1"] and clickX <= menu_button["x2"] and clickY >= menu_button["y1"] and clickY <= menu_button["y2"]:
+            if not menu_button["flag"]:
+                menu_button["text"].setTextColor(settings["bg_color"])
+                menu_button["text"].setText("?")
+                menu_button["rect"].setFill(settings["fg_color"])
+                
+                menu_button["flag"] = True
+            else:
+                menu_button["text"].setTextColor(settings["fg_color"])
+                menu_button["text"].setText("X")
+                menu_button["rect"].setFill(settings["bg_color"])
+                
+                menu_button["flag"] = False
+        ### THEN CHECK IF PLAYER CLICKED A GRID BUTTON ###
         for button in buttons:
             if clickX >= button["x1"] and clickX <= button["x2"] and clickY >= button["y1"] and clickY <= button["y2"] and not button["clicked"]:
                 if settings["debug_mode"]:
                     print("Clicked on {}".format(str(button)))
-                #flash_button(win,button,0.0001)
-                button["rect"].setFill(settings["bg_color"])
-                button["text"].setTextColor(settings["fg_color"])
-                if button["mined"]:
-                    button["text"].setText(":(")
+                if menu_button["flag"]:
+                    button["text"].setText("?")
                     win.update()
-                    key = "Escape"
-                    time.sleep(0.2)
-                    for button in buttons:
-                        if button["mined"]:
-                            button["text"].setText("X")
-                    win.update()
-                    show_info_box(win,"KaBoom!  You lose!",1.5)
-                elif button["adjacent"] == 0:
-                    check_adjacent(win,buttons,button)
-                    reveal_borders(win,buttons)
                 else:
-                    button["text"].setText(str(button["adjacent"]))
-                button["clicked"] = True
+                    #flash_button(win,button,0.0001)
+                    button["rect"].setFill(settings["bg_color"])
+                    button["text"].setTextColor(settings["fg_color"])
+                    if button["mined"]:
+                        button["text"].setText(":(")
+                        win.update()
+                        key = "Escape"
+                        time.sleep(0.2)
+                        for button in buttons:
+                            if button["mined"]:
+                                button["text"].setText("X")
+                        win.update()
+                        show_info_box(win,"KaBoom!  You lose!",1.5)
+                    elif button["adjacent"] == 0:
+                        check_adjacent(win,buttons,button)
+                        reveal_borders(win,buttons)
+                    else:
+                        button["text"].setText(str(button["adjacent"]))
+                    button["clicked"] = True
         win.update()
         victory = check_victory(win,buttons)
         if victory:
