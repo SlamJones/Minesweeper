@@ -10,10 +10,10 @@ from graphics import *
 settings = {
     "debug_mode": False,
     "window_x": 1000,
-    "window_y": 980,
+    "window_y": 880,
     "bg_color": "black",
     "fg_color": "white",
-    "square_size": 50,
+    "square_size": 45,
     "rows_easy": 8,
     "rows_medium": 12,
     "rows_hard": 16,
@@ -169,6 +169,7 @@ def choice_buttons(win,choices,header):
     click = win.getMouse()
     clickX = click.getX()
     clickY = click.getY()
+    choice = "easy"
     for button in buttons:
         if clickX >= button["x1"] and clickX <= button["x2"] and clickY >= button["y1"] and clickY <= button["y2"]:
             choice = button["text"].getText()
@@ -176,12 +177,12 @@ def choice_buttons(win,choices,header):
         else:
             button["rect"].setFill(settings["bg_color"])
             button["text"].setTextColor(settings["fg_color"])
-            choice = "Easy"
     ####################
     for item in to_draw:
         item.undraw()
     win.update()
     choice = choice.lower()
+    print("Clicked {}".format(choice))
     return(choice)
     
     
@@ -263,6 +264,16 @@ def draw_grid(win,grid,rows,difficulty):
     
     menu_button = {"rect": center_button, "text": center_text, "x1": cP1X, "y1": cP1Y, "x2": cP2X, "y2": cP2Y, "flag": False,}
     
+    mine_count_box = Rectangle(Point(settings["window_x"] - 200,50),Point(settings["window_x"] - 50, 100))
+    mine_count_box.setFill("white")
+    to_draw.append(mine_count_box)
+    
+    mine_count = settings["mines_"+difficulty]
+    mine_count_text = Text(Point(settings["window_x"] - 125,75),"0 / {}".format(mine_count))
+    mine_count_text.setTextColor("black")
+    to_draw.append(mine_count_text)
+    
+    
     for i in range(rows):
         P1X += settings["square_size"]
         #P1Y += settings["square_size"]
@@ -343,6 +354,7 @@ def draw_grid(win,grid,rows,difficulty):
     ##### SET A FEW BUTTONS AS MINED #####
     difficulty = difficulty.lower()
     mines = settings["mines_"+difficulty]
+    mines_marked = 0
     
     for i in range(mines):
         button = random.choice(buttons)
@@ -420,6 +432,8 @@ def draw_grid(win,grid,rows,difficulty):
     #####
     ##### PLAYER INPUT STACK #####
     while key == "":
+        mine_count_text.setText("{} / {}".format(mines_marked,mines))
+        
         key = win.checkKey()
         click = win.checkMouse()
         try:
@@ -450,7 +464,12 @@ def draw_grid(win,grid,rows,difficulty):
                 if settings["debug_mode"]:
                     print("Clicked on {}".format(str(button)))
                 if menu_button["flag"]:
-                    button["text"].setText("?")
+                    if button["text"].getText() == "":
+                        button["text"].setText("?")
+                        mines_marked += 1
+                    else:
+                        button["text"].setText("")
+                        mines_marked -= 1
                     win.update()
                 else:
                     #flash_button(win,button,0.0001)
